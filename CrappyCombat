@@ -1,0 +1,196 @@
+"""Importa la biblioteca PyGame"""
+import pygame
+
+"Inicializa la biblioteca de PyGame"
+pygame.init()
+
+"""Main frame"""
+win = pygame.display.set_mode((500, 480))
+
+"""Main name"""
+pygame.display.set_caption("Retro Fighter")
+
+"""Background"""
+bg = pygame.image.load('BackGround3.jpg')
+
+"""Imagen statica del Jugador1"""
+standingApa = pygame.image.load('S1.png')
+
+"""Imagen en movimiento hacia la izquierda de el Jugador1"""
+walkRightApa = [pygame.image.load('R1.png'), pygame.image.load('R2.png'),
+pygame.image.load('R3.png'), pygame.image.load('R4.png'),
+pygame.image.load('R5.png'), pygame.image.load('R6.png'),
+pygame.image.load('R7.png'), pygame.image.load('R8.png')]
+
+"""Imagen en movimiento hacia la derecha de el Jugador1"""
+walkLeftApa = [pygame.image.load('L1.png'), pygame.image.load('L2.png'),
+pygame.image.load('L3.png'), pygame.image.load('L4.png'),
+pygame.image.load('L5.png'), pygame.image.load('L6.png'),
+pygame.image.load('L7.png'), pygame.image.load('L8.png')]
+
+"""Imagen en movimiento del ataque del Jugador1"""
+atackApa = [pygame.image.load('A1.png'), pygame.image.load('A2.png'),
+ pygame.image.load('A3.png'), pygame.image.load('A1.png'),
+ pygame.image.load('A4.png'), pygame.image.load('A5.png'),
+ pygame.image.load('A6.png'), pygame.image.load('A7.png')]
+
+
+clock = pygame.time.Clock()
+
+#Caractheristics
+class player(object):
+    def __init__(self, x, y, width, height):
+        self.x = x
+        self.y = y
+        self.width = width
+        self.height = height
+        self.vel = 5
+        self.isJump = False
+        self.jumpCount = 10
+        self.left = False
+        self.right = False
+        self.walkCount = 0
+        self.standing = True
+
+    def draw(self, win):
+        if self.walkCount + 1 >= 24:
+            self.walkCount = 0
+
+        if self.left:
+            win.blit(walkLeftApa[self.walkCount//3], (self.x, self.y))
+            self.walkCount += 1
+
+        elif self.right:
+            win.blit(walkRightApa[self.walkCount//3], (self.x, self.y))
+            self.walkCount += 1
+
+        else:
+            if self.right:
+                win.blit(walkRightApa[0], (self.x, self.y))
+            else:
+                win.blit(walkLeftApa[0], (self.x, self.y))
+
+class player2(object):
+    def __init__(self, x, y, width, height):
+        self.x = x
+        self.y = y
+        self.width = width
+        self.height = height
+        self.vel = 5
+        self.isJump = False
+        self.jumpCount = 10
+        self.left = False
+        self.right = False
+        self.walkCount = 0
+        self.standing = True
+
+    def draw(self, win):
+        if self.walkCount + 1 >= 24:
+            self.walkCount = 0
+
+        if self.left:
+            win.blit(walkLeftApa[self.walkCount//3], (self.x, self.y))
+            self.walkCount += 1
+
+        elif self.right:
+            win.blit(walkRightApa[self.walkCount//3], (self.x, self.y))
+            self.walkCount += 1
+
+        else:
+            if self.right:
+                win.blit(walkRightApa[0], (self.x, self.y))
+            else:
+                win.blit(walkLeftApa[0], (self.x, self.y))
+
+
+class projectile(object):
+    def __init__(self, x, y, radius, color, facing):
+        self.x = x
+        self.y = y
+        self.radius = radius
+        self.color = color
+        self.facing = facing
+        self.vel = 8 * facing
+
+    def draw(self, win):
+        pygame.draw.circle(win, self.color, (self.x, self.y), self.radius)
+
+
+
+
+def redrawGameWindow():
+    win.blit(bg, (0,0))
+    apa.draw(win)
+    enemy.draw(win)
+    for power in powers:
+        power.draw(win)
+    pygame.display.update()
+
+"""MainLoop"""
+apa = player(300, 410, 64, 64)
+enemy = player(400, 410, 64, 64)
+run = True
+powers = []
+while run:
+    #speed of the program in miliseconds
+    clock.tick(24)
+
+    #evens loop
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            run = False
+
+    for power in powers:
+        if power.x < 500 and power.x > 0:
+            power.x += power.vel
+        else:
+            powers.pop(powers.index(power))
+
+    #moviemientos del objeto
+    keys = pygame.key.get_pressed()
+
+    if keys[pygame.K_SPACE]:
+        if apa.left:
+            facing = -1
+        else:
+            facing = 1
+        if len(powers) < 5:
+            powers.append(projectile(round(apa.x + apa.width //2), round(apa.y + apa.height //2), 6, (0, 150, 150), facing))
+
+
+    if keys[pygame.K_LEFT] and apa.x > apa.vel:
+        apa.x -= apa.vel
+        apa.left = True
+        apa.right = False
+        apa.standing = False
+
+    elif keys[pygame.K_RIGHT] and apa.x < 500 - apa.width - apa.vel:
+        apa.x += apa.vel
+        apa.left = False
+        apa.right = True
+        apa.standing = False
+
+    else:
+
+        walkCount = 0
+
+    if not(apa.isJump):
+        if keys[pygame.K_UP]:
+            apa.isJump = True
+            apa.right = False
+            apa.left = False
+            apa.walkCount = 0
+    else:
+        if apa.jumpCount >= -10:
+            neg = 1
+            if apa.jumpCount < 0:
+                neg = -1
+            apa.y -= (apa.jumpCount ** 2) * 0.5 * neg
+            apa.jumpCount -= 2
+        else:
+            apa.isJump = False
+            apa.jumpCount = 10
+
+    redrawGameWindow()
+
+pygame.quit()
