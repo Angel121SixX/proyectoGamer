@@ -5,39 +5,69 @@ import pygame
 pygame.init()
 
 """Main frame"""
-win = pygame.display.set_mode((500, 480))
+win = pygame.display.set_mode((800, 500))
 
 """Main name"""
 pygame.display.set_caption("Retro Fighter")
 
 """Background"""
-bg = pygame.image.load('BackGround3.jpg')
+bg = pygame.image.load('BackGroundBar.jpeg')
 
 """Imagen statica del Jugador1"""
-standingApa = pygame.image.load('S1.png')
+standingVerdugo = [pygame.image.load('verdugo_parado(1).png'),
+pygame.image.load('verdugo_parado(2).png')]
+
+"""Imagen statica del Jugador2"""
+standingShaggy = [pygame.image.load('shaggy_parado(1).png'),
+pygame.image.load('shaggy_parado(2).png'),
+pygame.image.load('shaggy_parado(3).png')]
+
+"""Imagen en movimiento hacia la izquierda de el Jugador2"""
+walkLeftShaggy = [pygame.image.load('shaggy_izquierda(1).png'),
+pygame.image.load('shaggy_izquierda(2).png'),
+pygame.image.load('shaggy_izquierda(3).png')]
+
+"""Imagen en movimiento hacia la derecha de el Jugador2"""
+walkRightShaggy = [pygame.image.load('shaggy_Derecha(1).png'),
+pygame.image.load('shaggy_Derecha(2).png'),
+pygame.image.load('shaggy_Derecha(3).png')]
 
 """Imagen en movimiento hacia la izquierda de el Jugador1"""
-walkRightApa = [pygame.image.load('R1.png'), pygame.image.load('R2.png'),
-pygame.image.load('R3.png'), pygame.image.load('R4.png'),
-pygame.image.load('R5.png'), pygame.image.load('R6.png'),
-pygame.image.load('R7.png'), pygame.image.load('R8.png')]
+walkRightVergudo = [pygame.image.load('verdugo_derecha(1).png'),
+pygame.image.load('verdugo_derecha(2).png'),
+pygame.image.load('verdugo_derecha(3).png'),
+pygame.image.load('verdugo_derecha(4).png')]
 
 """Imagen en movimiento hacia la derecha de el Jugador1"""
-walkLeftApa = [pygame.image.load('L1.png'), pygame.image.load('L2.png'),
-pygame.image.load('L3.png'), pygame.image.load('L4.png'),
-pygame.image.load('L5.png'), pygame.image.load('L6.png'),
-pygame.image.load('L7.png'), pygame.image.load('L8.png')]
+walkLeftVerdugo = [pygame.image.load('verdugo_izquierda(1).png'),
+pygame.image.load('verdugo_izquierda(2).png'),
+pygame.image.load('verdugo_izquierda(3).png'),
+pygame.image.load('verdugo_izquierda(4).png')]
 
 """Imagen en movimiento del ataque del Jugador1"""
-atackApa = [pygame.image.load('A1.png'), pygame.image.load('A2.png'),
- pygame.image.load('A3.png'), pygame.image.load('A1.png'),
- pygame.image.load('A4.png'), pygame.image.load('A5.png'),
- pygame.image.load('A6.png'), pygame.image.load('A7.png')]
+atackVergudo = [pygame.image.load('verdugo_atacando(1).png'),
+pygame.image.load('verdugo_atacando(2).png'),
+pygame.image.load('verdugo_atacando(3).png')]
 
+"""Imagen en movimiento del ataque del Jugador1"""
+atackShaggy = [pygame.image.load('shaggy_atacando(1).png'),
+pygame.image.load('shaggy_atacando(2).png')]
 
+"""Clock?"""
 clock = pygame.time.Clock()
 
-#Caractheristics
+""" Nombre de Player """
+namePlayer = "Verdugo"
+
+""" Nombre de Player2 """
+namePlayer2 = "Shaggy"
+
+""" Efectos de Sonido """
+
+
+
+
+"""Caractheristics Player"""
 class player(object):
     def __init__(self, x, y, width, height):
         self.x = x
@@ -49,27 +79,40 @@ class player(object):
         self.jumpCount = 10
         self.left = False
         self.right = False
+        self.atack = False
         self.walkCount = 0
         self.standing = True
+        self.hitbox = (self.x + 16, self.y + 16, 32, 32)
+        self.health = 10
+        self.alive = True
 
     def draw(self, win):
-        if self.walkCount + 1 >= 24:
-            self.walkCount = 0
+        if self.alive == True:
+            if self.walkCount + 1 >= 9:
+                self.walkCount = 0
 
-        if self.left:
-            win.blit(walkLeftApa[self.walkCount//3], (self.x, self.y))
-            self.walkCount += 1
+            if not(self.standing):
 
-        elif self.right:
-            win.blit(walkRightApa[self.walkCount//3], (self.x, self.y))
-            self.walkCount += 1
+                if self.left:
+                    win.blit(walkLeftVerdugo[self.walkCount//3], (self.x, self.y))
+                    self.walkCount += 1
 
-        else:
-            if self.right:
-                win.blit(walkRightApa[0], (self.x, self.y))
+                elif self.right:
+                    win.blit(walkRightVerdugo[self.walkCount//3], (self.x, self.y))
+                    self.walkCount += 1
+
             else:
-                win.blit(walkLeftApa[0], (self.x, self.y))
+                if self.right:
+                    win.blit(walkRightVerdugo[0], (self.x, self.y))
+                else:
+                    win.blit(walkLeftVerdugo[0], (self.x, self.y))
 
+        self.hitbox = (self.x + 16, self.y + 16, 32, 32)
+        pygame.draw.rect(win, (255, 0, 0), self.hitbox, 2)
+        pygame.draw.rect(win, (255, 0, 0), (5, 5, 200, 40))
+        pygame.draw.rect(win, (0, 255, 0), (5, 5, 200 - ((200/10) * (10 - self.health)), 40))
+
+"""Characteristics Player2"""
 class player2(object):
     def __init__(self, x, y, width, height):
         self.x = x
@@ -83,26 +126,43 @@ class player2(object):
         self.right = False
         self.walkCount = 0
         self.standing = True
+        self.hitbox = (self.x + 45, self.y + 45, 90, 90)
+        self.health = 10
+        self.alive = True
 
     def draw(self, win):
-        if self.walkCount + 1 >= 24:
-            self.walkCount = 0
+        if self.alive == True:
+            if self.walkCount + 1 >= 9:
+                self.walkCount = 0
 
-        if self.left:
-            win.blit(walkLeftApa[self.walkCount//3], (self.x, self.y))
-            self.walkCount += 1
+            if not(self.standing):
 
-        elif self.right:
-            win.blit(walkRightApa[self.walkCount//3], (self.x, self.y))
-            self.walkCount += 1
+                if self.left:
+                    win.blit(walkLeftShaggy[self.walkCount//3], (self.x, self.y))
+                    self.walkCount += 1
 
-        else:
-            if self.right:
-                win.blit(walkRightApa[0], (self.x, self.y))
+                elif self.right:
+                    win.blit(walkRightShaggy[self.walkCount//3], (self.x, self.y))
+                    self.walkCount += 1
+
             else:
-                win.blit(walkLeftApa[0], (self.x, self.y))
+                if self.right:
+                    win.blit(walkRightShaggy[0], (self.x, self.y))
+                else:
+                    win.blit(walkLeftShaggy[0], (self.x, self.y))
+            self.hitbox = (self.x + 45, self.y + 45, 90, 90)
+            pygame.draw.rect(win, (255, 0, 0), self.hitbox, 2)
+            pygame.draw.rect(win, (255, 0, 0), (280, 5, 200, 40))
+            pygame.draw.rect(win, (0, 255, 0), (280, 5, 200 - ((200/10) * (10 - self.health)), 40))
 
+    def colision(self):
+        if self.health > 0:
+            self.health -= 1
+        else:
+            self.alive = False
+        pass
 
+"""Characteristics Projectile"""
 class projectile(object):
     def __init__(self, x, y, radius, color, facing):
         self.x = x
@@ -115,81 +175,133 @@ class projectile(object):
     def draw(self, win):
         pygame.draw.circle(win, self.color, (self.x, self.y), self.radius)
 
-
-
-
+"""Funcion de Redraw"""
 def redrawGameWindow():
     win.blit(bg, (0,0))
-    apa.draw(win)
-    enemy.draw(win)
+    name1 = font.render(namePlayer, 1, (255, 255, 255))
+    name2 = font.render(namePlayer2, 1, (255, 255, 255))
+    win.blit(name1, (5, 50))
+    win.blit(name2, (390, 50))
+    # characterNamePlayer = font.render('')
+
+    verdugo.draw(win)
+    shaggy.draw(win)
     for power in powers:
         power.draw(win)
     pygame.display.update()
 
 """MainLoop"""
-apa = player(300, 410, 64, 64)
-enemy = player(400, 410, 64, 64)
-run = True
+font = pygame.font.SysFont('comicsans', 30, True)
+verdugo = player(5, 410, 280, 300)
+shaggy = player2(400, 300, 300, 300)
 powers = []
+run = True
 while run:
-    #speed of the program in miliseconds
+    """Velocidad del programa en milisegundos"""
     clock.tick(24)
 
-    #evens loop
+    """Eventos en ciclo"""
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             run = False
 
     for power in powers:
+        if power.y - power.radius < shaggy.hitbox[1] + shaggy.hitbox[3] and power.y + power.radius > shaggy.hitbox[1]:
+            if power.x + power.radius > shaggy.hitbox[0] and power.x - power.radius < shaggy.hitbox[0] + shaggy.hitbox[2]:
+                shaggy.colision()
+                powers.pop(powers.index(power))
+
         if power.x < 500 and power.x > 0:
             power.x += power.vel
         else:
             powers.pop(powers.index(power))
 
-    #moviemientos del objeto
+
+
+    """Lector de teclas presionadas"""
     keys = pygame.key.get_pressed()
 
+    """ Tecla de poder Player """
     if keys[pygame.K_SPACE]:
-        if apa.left:
+        if verdugo.left:
             facing = -1
         else:
             facing = 1
         if len(powers) < 5:
-            powers.append(projectile(round(apa.x + apa.width //2), round(apa.y + apa.height //2), 6, (0, 150, 150), facing))
+            powers.append(projectile(round(verdugo.x + verdugo.width //2), round(verdugo.y + verdugo.height //2), 6, (0, 150, 150), facing))
 
+    """ Teclas de movimiento Player """
+    if keys[pygame.K_LEFT] and verdugo.x > verdugo.vel:
+        verdugo.x -= verdugo.vel
+        verdugo.left = True
+        verdugo.right = False
+        verdugo.standing = False
 
-    if keys[pygame.K_LEFT] and apa.x > apa.vel:
-        apa.x -= apa.vel
-        apa.left = True
-        apa.right = False
-        apa.standing = False
-
-    elif keys[pygame.K_RIGHT] and apa.x < 500 - apa.width - apa.vel:
-        apa.x += apa.vel
-        apa.left = False
-        apa.right = True
-        apa.standing = False
+    elif keys[pygame.K_RIGHT] and verdugo.x < 500 - verdugo.width - verdugo.vel:
+        verdugo.x += verdugo.vel
+        verdugo.left = False
+        verdugo.right = True
+        verdugo.standing = False
 
     else:
 
         walkCount = 0
 
-    if not(apa.isJump):
-        if keys[pygame.K_UP]:
-            apa.isJump = True
-            apa.right = False
-            apa.left = False
-            apa.walkCount = 0
+    """ Teclas de movimiento PLayer2 """
+
+    if keys[pygame.K_a] and shaggy.x > shaggy.vel:
+        shaggy.x -= verdugo.vel
+        shaggy.left = True
+        shaggy.right = False
+        shaggy.standing = False
+
+    elif keys[pygame.K_d] and shaggy.x < 500 - shaggy.width - shaggy.vel:
+        shaggy.x += shaggy.vel
+        shaggy.left = True
+        shaggy.right = False
+        shaggy.standing = False
+
     else:
-        if apa.jumpCount >= -10:
+
+        walkCount = 0
+
+    """ Teclas de salto Player """
+
+    if not(verdugo.isJump):
+        if keys[pygame.K_UP]:
+            verdugo.isJump = True
+            verdugo.right = False
+            verdugo.left = False
+            verdugo.walkCount = 0
+    else:
+        if verdugo.jumpCount >= -10:
             neg = 1
-            if apa.jumpCount < 0:
+            if verdugo.jumpCount < 0:
                 neg = -1
-            apa.y -= (apa.jumpCount ** 2) * 0.5 * neg
-            apa.jumpCount -= 2
+            verdugo.y -= (verdugo.jumpCount ** 2) * 0.5 * neg
+            verdugo.jumpCount -= 2
         else:
-            apa.isJump = False
-            apa.jumpCount = 10
+            verdugo.isJump = False
+            verdugo.jumpCount = 10
+
+    """ Teclas de salto Player2 """
+
+    if not(shaggy.isJump):
+        if keys[pygame.K_w]:
+            shaggy.isJump = True
+            shaggy.right = False
+            shaggy.left = False
+            shaggy.walkCount = 0
+    else:
+        if shaggy.jumpCount >= -10:
+            neg = 1
+            if shaggy.jumpCount < 0:
+                neg = -1
+            shaggy.y -= (shaggy.jumpCount ** 2) * 0.5 * neg
+            shaggy.jumpCount -= 2
+        else:
+            shaggy.isJump = False
+            shaggy.jumpCount = 10
 
     redrawGameWindow()
 
