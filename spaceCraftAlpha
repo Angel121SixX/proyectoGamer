@@ -26,28 +26,64 @@ def gameStart():
 
     clock = pygame.time.Clock()
 
+    """ Agregamos la nave al juego como un rectangulo """
+
+    naveStanding = [pygame.image.load('staticSpaceShip.png'), pygame.image.load('staticSpaceShip2.png')]
+
+    """ Agregamos el movimiento de la nave hacia arriba y hacia abajo """
+
+    naveArriba = [pygame.image.load('staticSpaceShip.png'), pygame.image.load('staticSpaceShip2.png')]
+
+    naveAbajo = [pygame.image.load('staticSpaceShip.png'), pygame.image.load('staticSpaceShip2.png')]
+
 
     class spaceShip(object):
 
         def __init__(self, x, y, width, height):
-            self.x = x 
-            self.y = y 
+            self.x = x
+            self.y = y
             self.width = width
             self.height = height
-            self.vel = vel
-            self.health = health 
-            self.boost = boost
+            self.vel = 5
+            self.health = 1250
+            self.boost = False
+            self.flyCount = 0
             self.alive = True
+            self.standing = True
+            self.up = False
+            self.down = False
+            self.atack = False
 
         def draw(self, win):
-            if self.alive == true
-                
+            if self.alive == True:
+                if self.flyCount + 1 >= 9:
+                    self.flyCount = 0
+
+            if not(self.standing):
+
+                if self.up:
+                    win.blit(naveArriba[self.flyCount//2], (self.x, self.y))
+                    self.walkCount += 1
+
+                elif self.down:
+                    win.blit(naveAbajo[self.flyCount//2], (self.x, self.y))
+                    self.walkCount += 1
+
+            else:
+                if self.standing:
+                    win.blit(naveStanding, (self.x, self.y))
+
+
 
 
     def redrawGameWindow():
         w.blit(bg, (0,0))
+        naveStanding.draw(w)
         pygame.display.update()
 
+
+
+    naveStanding = spaceShip(100, 400, 340, 145)
     run = True
     while run:
         clock.tick(16.33)
