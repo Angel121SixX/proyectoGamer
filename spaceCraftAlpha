@@ -1,0 +1,63 @@
+""" Importar la bilioteca de Pygame"""
+
+import pygame
+
+""" Una funcion la cual inicializara el videojuego """
+
+def gameStart():
+
+    """ Inicializamos la biblioteca de pygame """
+    pygame.init()
+
+    """ Definamos el tamaño de la Main Frame """
+
+    w = pygame.display.set_mode((1280,720))
+
+    """ Definamos el nombre de el videojuego
+    (El nombre se visualizara en la parte superior de la pantalla)"""
+
+    pygame.display.set_caption("RetroFighterX")
+
+    """ Agregemos el fondo de pantalla """
+
+    bg = pygame.image.load('8-bit-pixel-art-city-2o.jpg')
+
+    """ Agregamos la imagen estatica de la nave #1 """
+
+    clock = pygame.time.Clock()
+
+
+    class spaceShip(object):
+
+        def __init__(self, x, y, width, height):
+            self.x = x 
+            self.y = y 
+            self.width = width
+            self.height = height
+            self.vel = vel
+            self.health = health 
+            self.boost = boost
+            self.alive = True
+
+        def draw(self, win):
+            if self.alive == true
+                
+
+
+    def redrawGameWindow():
+        w.blit(bg, (0,0))
+        pygame.display.update()
+
+    run = True
+    while run:
+        clock.tick(16.33)
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                run = False
+
+        redrawGameWindow()
+
+    pygame.quit()
+
+
+gameStart()
