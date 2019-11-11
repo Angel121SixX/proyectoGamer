@@ -36,7 +36,12 @@ def gameStart():
 
     naveAbajo = [pygame.image.load('staticSpaceShip.png'), pygame.image.load('staticSpaceShip2.png')]
 
+    """ Agregamos el sprite de el objeto de la clase missile """
 
+    piupiu = [pygame.image.load('LaserBall.png'), pygame.image.load('LaserBall2.png')]
+
+
+    """ Clase que maneja el Jugador """
     class spaceShip(object):
 
         def __init__(self, x, y, width, height):
@@ -45,11 +50,12 @@ def gameStart():
             self.width = width
             self.height = height
             self.vel = 5
-            self.health = 1250
+            self.health = 10
             self.boost = False
             self.flyCount = 0
             self.alive = True
             self.standing = True
+            # self.hitbox = (self.x, self.y, 340, 145)
             self.up = False
             self.down = False
             self.atack = False
@@ -73,17 +79,64 @@ def gameStart():
                 if self.standing:
                     win.blit(naveStanding[(self.flyCount//3)%2], (self.x, self.y))
 
+            self.hitbox = (self.x + 45, self.y + 40, 280, 80)
+            pygame.draw.rect(win, (255, 0, 0), self.hitbox, 2)
+            # pygame.draw.rect(win, (255, 0, 0), (5, 5, 200, 40))
+            pygame.draw.rect(win, (0, 255, 0), (5, 5, 200 - ((200/10) * (10 - self.health)), 40))
+
+        def colision(self):
+            if self.health > 0:
+                self.health -= 1
+            else:
+                self.alive = False
+            pass
+
+    class enemyShip(object):
+
+        def __init__(self, x, y, width, height):
+            self.x = x
+            self.y = y
+            self.width = width
+            self.height = height
+            self.vel = 5
+            self.health = 3
+            self.flyCount = 0
+            self.alive = True
+
+        def colision(self):
+            if self.health > 0:
+                self.health -= 1
+            else:
+                self.alive = False
+            pass
+
+
+    class missile(object):
+
+        def __init__(self, x, y, radius, color, facing):
+            self.x = x
+            self.y = y
+            self.radius = radius
+            self.color = color
+            self.facing = facing
+            self.vel = 8 * facing
+
+        def draw(self, win):
+            win.blit(naveAbajo[(self.flyCount//3)%2], (self.x, self.y))
 
 
 
     def redrawGameWindow():
         w.blit(bg, (0,0))
         nave.draw(w)
+        # for power in powers:
+        #     power.draw(win)
         pygame.display.update()
 
 
 
     nave = spaceShip(100, 400, 340, 145)
+    # powers = []
     run = True
     while run:
         clock.tick(16.33)
@@ -91,9 +144,28 @@ def gameStart():
             if event.type == pygame.QUIT:
                 run = False
 
+        # for power in powers:
+        #     if power.y - power.radius < shaggy.hitbox[1] + shaggy.hitbox[3] and power.y + power.radius > shaggy.hitbox[1]:
+        #         if power.x + power.radius > shaggy.hitbox[0] and power.x - power.radius < shaggy.hitbox[0] + shaggy.hitbox[2]:
+        #             shaggy.colision()
+        #             powers.pop(powers.index(power))
+        #
+        #     if power.x < 500 and power.x > 0:
+        #         power.x += power.vel
+        #     else:
+        #         powers.pop(powers.index(power))
+
         """ Lector de teclas presionadas """
 
         keys = pygame.key.get_pressed()
+
+        # if keys[pygame.K_SPACE]:
+        #     if verdugo.left:
+        #         facing = -1
+        #     else:
+        #         facing = 1
+        #     if len(powers) < 5:
+        #         powers.append(projectile(round(verdugo.x + verdugo.width //2), round(verdugo.y + verdugo.height //2), 6, (0, 150, 150), facing))
 
         if keys[pygame.K_UP] and nave.y > nave.vel:
             nave.y -= nave.vel**2.5
@@ -113,4 +185,3 @@ def gameStart():
 
 
 gameStart()
-
