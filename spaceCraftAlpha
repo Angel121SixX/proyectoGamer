@@ -36,6 +36,16 @@ def gameStart():
 
     naveAbajo = [pygame.image.load('staticSpaceShip.png'), pygame.image.load('staticSpaceShip2.png')]
 
+    """ Agregamos la imagen estatica de la nave #2 """
+
+    enemyStanding = [pygame.image.load('staticSpaceShipcopy.png'), pygame.image.load('staticSpaceShip2copy.png')]
+
+    """ Agregamos el movimiento de la nave #2 hacia arriba y hacia abajo """
+
+    enemyArriba = [pygame.image.load('staticSpaceShipcopy.png'), pygame.image.load('staticSpaceShip2copy.png')]
+
+    enemyAbajo = [pygame.image.load('staticSpaceShipcopy.png'), pygame.image.load('staticSpaceShip2copy.png')]
+
     """ Agregamos el sprite de el objeto de la clase missile """
 
     piupiu = [pygame.image.load('LaserBall.png'), pygame.image.load('LaserBall2.png')]
@@ -51,7 +61,7 @@ def gameStart():
             self.height = height
             self.vel = 5
             self.health = 10
-            self.boost = False
+            self.visible= True
             self.flyCount = 0
             self.alive = True
             self.standing = True
@@ -59,6 +69,7 @@ def gameStart():
             self.up = False
             self.down = False
             self.atack = False
+
 
         def draw(self, win):
             if self.alive == True:
@@ -80,7 +91,7 @@ def gameStart():
                     win.blit(naveStanding[(self.flyCount//3)%2], (self.x, self.y))
 
             self.hitbox = (self.x + 45, self.y + 40, 280, 80)
-            pygame.draw.rect(win, (255, 0, 0), self.hitbox, 2)
+            # pygame.draw.rect(win, (255, 0, 0), self.hitbox, 2)
             # pygame.draw.rect(win, (255, 0, 0), (5, 5, 200, 40))
             pygame.draw.rect(win, (0, 255, 0), (5, 5, 200 - ((200/10) * (10 - self.health)), 40))
 
@@ -99,9 +110,39 @@ def gameStart():
             self.width = width
             self.height = height
             self.vel = 5
-            self.health = 3
+            self.health = 10
+            self.visible = True
             self.flyCount = 0
             self.alive = True
+            self.standing = True
+            # self.hitbox = (self.x, self.y, 340, 145)
+            self.up = False
+            self.down = False
+            self.atack = False
+
+        def draw(self, win):
+            if self.alive == True:
+                if self.flyCount + 1 >= 9:
+                    self.flyCount = 0
+
+            if not(self.standing):
+
+                if self.up:
+                    win.blit(enemyArriba[(self.flyCount//3)%2], (self.x, self.y))
+                    self.flyCount += 1
+
+                elif self.down:
+                    win.blit(enemyAbajo[(self.flyCount//3)%2], (self.x, self.y))
+                    self.flyCount += 1
+
+            else:
+                if self.standing:
+                    win.blit(enemyStanding[(self.flyCount//3)%2], (self.x, self.y))
+
+            self.hitbox = (self.x + 10, self.y + 40, 280, 80)
+            # pygame.draw.rect(win, (255, 0, 0), self.hitbox, 2)
+            # pygame.draw.rect(win, (255, 0, 0), (5, 5, 200, 40))
+            pygame.draw.rect(win, (0, 255, 0), (1070, 5, 200 - ((200/10) * (10 - self.health)), 40))
 
         def colision(self):
             if self.health > 0:
@@ -119,24 +160,25 @@ def gameStart():
             self.radius = radius
             self.color = color
             self.facing = facing
-            self.vel = 8 * facing
+            self.vel = 30 * facing
 
         def draw(self, win):
-            win.blit(naveAbajo[(self.flyCount//3)%2], (self.x, self.y))
+            pygame.draw.circle(win, self.color, (self.x, self.y), self.radius)
 
 
 
     def redrawGameWindow():
         w.blit(bg, (0,0))
         nave.draw(w)
-        # for power in powers:
-        #     power.draw(win)
+        enemy.draw(w)
+        for m in ms:
+            m.draw(w)
         pygame.display.update()
 
 
-
-    nave = spaceShip(100, 400, 340, 145)
-    # powers = []
+    nave = spaceShip(50, 400, 340, 145)
+    enemy = enemyShip(900, 400, 340, 145)
+    ms = []
     run = True
     while run:
         clock.tick(16.33)
@@ -144,28 +186,35 @@ def gameStart():
             if event.type == pygame.QUIT:
                 run = False
 
-        # for power in powers:
-        #     if power.y - power.radius < shaggy.hitbox[1] + shaggy.hitbox[3] and power.y + power.radius > shaggy.hitbox[1]:
-        #         if power.x + power.radius > shaggy.hitbox[0] and power.x - power.radius < shaggy.hitbox[0] + shaggy.hitbox[2]:
-        #             shaggy.colision()
-        #             powers.pop(powers.index(power))
-        #
-        #     if power.x < 500 and power.x > 0:
-        #         power.x += power.vel
-        #     else:
-        #         powers.pop(powers.index(power))
+        for m in ms:
+            if m.y - m.radius < nave.hitbox[1] + nave.hitbox[3] and m.y + m.radius > nave.hitbox[1]:
+                if m.x + m.radius > nave.hitbox[0] and m.x - m.radius < nave.hitbox[0] + nave.hitbox[2]:
+                    nave.colision()
+                    ms.pop(ms.index(m))
+
+            if m.y - m.radius < enemy.hitbox[1] + enemy.hitbox[3] and m.y + m.radius > enemy.hitbox[1]:
+                if m.x + m.radius > enemy.hitbox[0] and m.x - m.radius < enemy.hitbox[0] + enemy.hitbox[2]:
+                    enemy.colision()
+                    ms.pop(ms.index(m))
+
+            if m.x < 1280 and m.x > 0:
+                m.x += m.vel
+            else:
+                ms.pop(ms.index(m))
 
         """ Lector de teclas presionadas """
 
         keys = pygame.key.get_pressed()
 
-        # if keys[pygame.K_SPACE]:
-        #     if verdugo.left:
-        #         facing = -1
-        #     else:
-        #         facing = 1
-        #     if len(powers) < 5:
-        #         powers.append(projectile(round(verdugo.x + verdugo.width //2), round(verdugo.y + verdugo.height //2), 6, (0, 150, 150), facing))
+        if keys[pygame.K_SPACE]:
+            facing = 2
+            if len(ms) < 5:
+                ms.append(missile(round(nave.x + nave.width + 100 //2), round(nave.y + nave.height //2), 6, (0, 150, 150), facing))
+
+        if keys[pygame.K_j]:
+            facing = 2
+            if len(ms) < 5:
+                ms.append(missile(round(enemy.x + enemy.width - 700 //2), round(enemy.y + enemy.height //2), 6, (0, 150, 150), -facing))
 
         if keys[pygame.K_UP] and nave.y > nave.vel:
             nave.y -= nave.vel**2.5
@@ -178,6 +227,18 @@ def gameStart():
             nave.up = True
             nave.down = False
             nave.standing = False
+
+        if keys[pygame.K_w] and enemy.y > enemy.vel:
+            enemy.y -= enemy.vel**2.5
+            enemy.down = True
+            enemy.up = False
+            enemy.standing = False
+
+        if keys[pygame.K_s] and enemy.y < 900 - enemy.width - enemy.vel:
+            enemy.y += enemy.vel**2.5
+            enemy.up = True
+            enemy.down = False
+            enemy.standing = False
 
         redrawGameWindow()
 
